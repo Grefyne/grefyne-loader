@@ -1,0 +1,124 @@
+#########################################
+# Main ProxySQL Configuration
+#########################################
+
+# Directory to store ProxySQL data (e.g., runtime or on-disk database)
+datadir="/etc" 
+pidfile="/etc/proxysql.pid"
+
+#########################################
+# Admin Interface
+#########################################
+
+admin_variables=
+{
+  # Credentials for the ProxySQL Admin interface
+  admin_credentials="admin:admin;rmadmin:rmadmin"
+  
+  # Bind address for the Admin interface
+  # By default, listens on 127.0.0.1:6032, but here we allow external access
+  # so we can connect to the Admin interface from outside the container.
+  mysql_ifaces="0.0.0.0:6032"
+}
+
+#########################################
+# Global MySQL Settings
+#########################################
+
+mysql_variables=
+{
+  # This is where you can configure global options such as
+  # thread counts, timeouts, or query cache sizes.
+  # We'll keep it empty or minimal for a simple setup.
+  max_connections=2048
+}
+
+#########################################
+# Galera Cluster Servers
+#########################################
+# We define each galera-node as a separate backend server.
+# hostgroup 1 will be used for both reads and writes (multi-master).
+#########################################
+
+mysql_servers =
+(
+  {
+    address="galera-node1"
+    port=3306
+    hostgroup=1
+    max_connections=1000
+  },
+  {
+    address="galera-node2"
+    port=3306
+    hostgroup=1
+    max_connections=1000
+  },
+  {
+    address="galera-node3"
+    port=3306
+    hostgroup=1
+    max_connections=1000
+  }
+)
+
+#########################################
+# MySQL Users
+#########################################
+# These are the credentials ProxySQL will accept from clients.
+# default_hostgroup=1 means any client connecting with these credentials
+# will be routed to hostgroup 1 (the Galera cluster).
+#########################################
+
+mysql_users =
+(
+  {
+    username="root"
+    password="supersecurepassword"
+    default_hostgroup=1
+  },
+  {
+    username="myuser"
+    password="mypassword"
+    default_hostgroup=1
+  }
+)
+
+#########################################
+# Query Rules
+#########################################
+# In this example, we have no custom query rules,
+# so queries go to the default hostgroup for each user.
+#########################################
+
+mysql_query_rules =
+(
+)
+
+#########################################
+# (Optional) Monitor User
+#########################################
+# It is recommended to create a dedicated monitor user in Galera
+# and add it to ProxySQL’s config. This user is used by ProxySQL
+# to run health checks and gather server statistics.
+# Example:
+#
+# mysql_users = (
+#   {
+#     username="monitor"
+#     password="monitorpass"
+#     default_hostgroup=1
+#     max_connections=100
+#   }
+#   ... your other users ...
+# )
+#
+# Then set:
+#
+# monitor_username="monitor"
+# monitor_password="monitorpass"
+#
+# in mysql_variables= { ... } block.
+#########################################
+
+# End of config
