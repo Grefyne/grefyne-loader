@@ -2,9 +2,9 @@
 apt update
 apt install wget -y
 rm -f /grafana/grafana.ini
-# wget -P /grafana https://raw.githubusercontent.com/Pidoxa-AASG/basem/refs/heads/main/grafana.ini
+cp  grafana.ini /grafana
 rm -f /prometheus/prometheus.yml
-# wget -P /prometheus https://raw.githubusercontent.com/Pidoxa-AASG/basem/refs/heads/main/prometheus.yml
+cp prometheus.yml /prometheus 
 rm -f /proxysql/proxysql.cnf
-# wget -P /prometheus https://raw.githubusercontent.com/Pidoxa-AASG/basem/refs/heads/main/proxysql.cnf
+cp proxysql.cnf /proxysql
 echo "done"
